@@ -10,10 +10,18 @@ const suggestions = [
 ];
 
 function Mark({ small = false }: { small?: boolean }) {
-  return <svg width={small ? 20 : 30} height={small ? 20 : 30} viewBox="0 0 30 30" fill="none" aria-hidden="true">
-    <rect x="3" y="2" width="20" height="26" rx="5" stroke="currentColor" strokeWidth="2" />
-    <path d="M9 10h8M9 15h8M9 20h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    <circle cx="23" cy="22" r="6" fill="#d6e8a8" /><path d="m21 22 1.5 1.5L25 20" stroke="#1b5148" strokeWidth="1.5" />
+  return <svg width={small ? 22 : 42} height={small ? 22 : 42} viewBox="0 0 40 40" fill="none" aria-hidden="true">
+    <rect width="40" height="40" rx="11" fill="#2563eb" />
+    <path d="M12 9h11l6 6v16H12V9Z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
+    <path d="M23 9v7h6M17 22h7M17 27h5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="31" cy="9" r="5" fill="#38bdf8" />
+  </svg>;
+}
+
+function FileGlyph() {
+  return <svg width="20" height="22" viewBox="0 0 20 22" fill="none" aria-hidden="true">
+    <path d="M4 1h8l5 5v15H4V1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    <path d="M12 1v6h5M8 11h5M8 15h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
   </svg>;
 }
 
@@ -132,8 +140,9 @@ export default function App() {
                 setSelected((current) => current.includes(document.id)
                   ? current.filter((id) => id !== document.id) : [...current, document.id]);
               }} />
+            <span className="file-icon"><FileGlyph /></span>
             <span className="document-text"><strong>{document.filename}</strong>
-              <small>{document.chunk_count} passages · {Math.max(1, Math.round(document.byte_size / 1024))} KB</small>
+              <small>{document.chunk_count} {document.chunk_count === 1 ? "passage" : "passages"} · {Math.max(1, Math.round(document.byte_size / 1024))} KB</small>
             </span>
           </label>
           <button className="delete-button" aria-label={"Delete " + document.filename} disabled={!!busy}
@@ -153,16 +162,20 @@ export default function App() {
     </aside>
 
     <main>
-      <header className="topbar"><span>Document workspace</span>
+      <header className="topbar">
+        <span className="topbar-title"><span className="workspace-icon" aria-hidden="true">▦</span>Workspace<span className="topbar-divider" aria-hidden="true">/</span><strong>Documents</strong></span>
+        <div className="workspace-status">
+        <span className="indexed-count">{documents.length} {documents.length === 1 ? "document" : "documents"} indexed</span>
         <span className={"mode-badge " + (health ? "" : "connecting")}>
           <i aria-hidden="true" />{health ? health.mode === "demo" ? "Retrieval demo" : "AI answers" : "Connecting"}
         </span>
+        </div>
       </header>
       <div className="main-content">
         <div className="intro">
-          <span className="eyebrow">LESS SEARCHING. MORE UNDERSTANDING.</span>
+          <span className="eyebrow"><span aria-hidden="true">✦</span> ASK. EXPLORE. VERIFY.</span>
           <h1>Your documents.<br /><em>Clear answers.</em></h1>
-          <p>Ask a question, follow the sources, and see exactly<br className="desktop-break" /> where the answer comes from.</p>
+          <p>Turn your files into answers you can verify.<br className="desktop-break" /> Every result leads back to the source.</p>
         </div>
 
         {error && <div role="alert" className="alert">
@@ -173,7 +186,7 @@ export default function App() {
         {notice && <p role="status" className="notice">{notice}</p>}
 
         <section className="question-card" aria-labelledby="question-heading">
-          <div className="card-title"><h2 id="question-heading">What would you like to know?</h2>
+          <div className="card-title"><h2 id="question-heading"><span className="question-symbol" aria-hidden="true">?</span>What would you like to know?</h2>
             <span>{selected.length ? selected.length + " selected" : "All documents"}</span>
           </div>
           <form onSubmit={ask}>
@@ -191,8 +204,8 @@ export default function App() {
 
         {!answer && !busy && <section className="suggestions" aria-label="Example questions">
           <h2>TRY IT WITH THE SAMPLE DOCUMENTS</h2>
-          <div>{suggestions.map((suggestion) => <button key={suggestion} onClick={() => chooseSuggestion(suggestion)}>
-            <span>{suggestion}</span><span aria-hidden="true">↗</span>
+          <div>{suggestions.map((suggestion, index) => <button key={suggestion} onClick={() => chooseSuggestion(suggestion)}>
+            <span className="suggestion-number" aria-hidden="true">0{index + 1}</span><span className="suggestion-copy">{suggestion}</span><span className="suggestion-arrow" aria-hidden="true">↗</span>
           </button>)}</div>
         </section>}
 
