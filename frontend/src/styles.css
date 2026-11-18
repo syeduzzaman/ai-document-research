@@ -532,3 +532,82 @@ main {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.workspace-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: fit-content;
+  margin: 0 0 26px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+}
+.workspace-switch button, .secondary-button {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 650;
+  text-align: left;
+}
+.workspace-switch button[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+.workspace-switch button[aria-pressed="false"]:hover { background: #edf3ff; }
+.repair-workspace .intro h1 { margin-top: 0; }
+.repair-example {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 18px 22px;
+  border: 1px solid #b7cdfb;
+  border-radius: 12px;
+  background: #edf3ff;
+}
+.repair-example h2 { font-size: 17px; }
+.repair-example p, .repair-scope {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.secondary-button { border-color: #a6bff9; color: #1e47b2; text-align: center; }
+.secondary-button:hover:not(:disabled) { background: #e1ebff; }
+.secondary-button:disabled { color: var(--muted); }
+.repair-scope { margin: 10px 26px 0; overflow-wrap: anywhere; }
+.repair-category, .repair-manual { margin-top: 20px; }
+.repair-category h3, .repair-manual h3 { margin-bottom: 8px; font-size: 15px; }
+.repair-category ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.repair-category li {
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+.repair-category li p { font-size: 14px; font-weight: 600; }
+.repair-citation { margin-top: 5px; color: #1e47b2; font-size: 12px; }
+.repair-citation summary { cursor: pointer; }
+.repair-citation summary span { margin-right: 4px; font-weight: 700; }
+.repair-citation blockquote {
+  margin: 8px 0 0;
+  padding: 8px 11px;
+  border-left: 3px solid #7da0f5;
+  background: #f3f6ff;
+  color: var(--ink);
+  font-size: 13px;
+}
+.repair-manual { padding: 13px 16px; border: 1px solid #e9c56d; border-radius: 8px; background: #fffaeb; color: #664009; }
+.repair-manual ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.repair-manual li + li { margin-top: 5px; }
+@media (max-width: 720px) {
+  .repair-example { padding: 15px 17px; }
+  .repair-scope { margin-left: 18px; margin-right: 18px; }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { request } from "./api";
+import RepairChecklist from "./RepairChecklist";
 import type { Answer, DocumentInfo, Health } from "./api";
 
 const suggestions = [
@@ -26,6 +27,7 @@ function FileGlyph() {
 }
 
 export default function App() {
+  const [workspace, setWorkspace] = useState<"questions" | "repair">("questions");
   const [documents, setDocuments] = useState<DocumentInfo[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
@@ -124,7 +126,9 @@ export default function App() {
       <a className="brand" href="/" aria-label="Document Assistant home"><Mark /><span>Document<br /><b>Assistant</b></span></a>
       <div className="workspace-label">YOUR WORKSPACE</div>
       <div className="library-heading"><h2>Documents</h2><span className="count">{documents.length}</span></div>
-      <p className="sidebar-description">Add your files. Find the answers inside.</p>
+      <p className="sidebar-description">{workspace === "repair"
+        ? "Select the current procedure files for your repair case."
+        : "Add your files. Find the answers inside."}</p>
       <input ref={fileInput} id="document-upload" className="visually-hidden" type="file" accept=".pdf,.txt,.md"
         aria-label="Upload document" disabled={!!busy} onChange={(event) => upload(event.target.files?.[0])} />
       <button className="upload-button" disabled={!!busy} onClick={() => fileInput.current?.click()}>
@@ -172,11 +176,20 @@ export default function App() {
         </div>
       </header>
       <div className="main-content">
-        <div className="intro">
+        <nav className="workspace-switch" aria-label="Workspace">
+          <button type="button" aria-pressed={workspace === "questions"} onClick={() => setWorkspace("questions")}>
+            Document Q&A
+          </button>
+          <button type="button" aria-pressed={workspace === "repair"} onClick={() => setWorkspace("repair")}>
+            Repair Estimate Checklist
+          </button>
+        </nav>
+
+        {workspace === "questions" && <div className="intro">
           <span className="eyebrow"><span aria-hidden="true">✦</span> ASK. EXPLORE. VERIFY.</span>
           <h1>Your documents.<br /><em>Clear answers.</em></h1>
           <p>Turn your files into answers you can verify.<br className="desktop-break" /> Every result leads back to the source.</p>
-        </div>
+        </div>}
 
         {error && <div role="alert" className="alert">
           <span>{error}</span>
@@ -185,6 +198,10 @@ export default function App() {
         </div>}
         {notice && <p role="status" className="notice">{notice}</p>}
 
+        {workspace === "repair" ? <RepairChecklist
+          documents={documents.filter((document) => selected.includes(document.id))}
+          mode={health?.mode}
+        /> : <>
         <section className="question-card" aria-labelledby="question-heading">
           <div className="card-title"><h2 id="question-heading"><span className="question-symbol" aria-hidden="true">?</span>What would you like to know?</h2>
             <span>{selected.length ? selected.length + " selected" : "All documents"}</span>
@@ -231,6 +248,8 @@ export default function App() {
             </details>)}
           </div>}
         </section>}
+
+        </>}
 
         <footer className="workspace-footer"><span>BUILT TO SHOW ITS SOURCES</span><p>PDF page references · Inspectable passages · Focused document search</p></footer>
       </div>

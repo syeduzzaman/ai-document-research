@@ -11,6 +11,7 @@ from app.answers import ProviderError
 from app.config import Settings
 from app.documents import DocumentError
 from app.embeddings import DemoEmbedder, OpenAIEmbedder
+from app.repair import RepairCase, RepairChecklist, generate_checklist, sample_checklist
 from app.repository import Repository
 from app.schemas import Answer, Document, Question, UploadResult
 from app.service import Assistant
@@ -95,6 +96,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.post("/api/ask", response_model=Answer)
     def ask(question: Question):
         return assistant.ask(question)
+
+    @app.get("/api/repair-checklist/sample", response_model=RepairChecklist)
+    def repair_sample():
+        return sample_checklist(settings.samples_dir)
+
+    @app.post("/api/repair-checklist", response_model=RepairChecklist)
+    def repair_checklist(case: RepairCase):
+        if client is None:
+            raise HTTPException(status_code=409, detail="Enable OpenAI mode to generate a checklist from your files.")
+        sources = assistant.retrieve(
+            f"{case.scenario}\nRepair estimate submission photos, documents, and approvals.",
+            case.document_ids,
+            top_k=8,
+        )
+        return generate_checklist(client, settings.answer_model, case.scenario, sources)
 
     return app
 

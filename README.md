@@ -83,6 +83,20 @@ Modes have separate embedding namespaces. The sample documents are indexed for t
 
 In OpenAI mode, uploading sends extracted document text for embedding. Asking sends the question for embedding, and the question plus retrieved passages for answer generation. Answer requests set `store=False`; see OpenAI's current data policies for other retention details.
 
+## Repair Estimate Checklist
+
+Open **Repair Estimate Checklist → Run sample case** to see a fictional front bumper replacement
+with an estimate that increases by EUR 450 after teardown. The bundled sample runs without an API key.
+It uses the current revisions listed in [the sample manifest](sample-documents/repair/procedures.json).
+The current approval procedure requires written authorization above EUR 300; the archived version used
+a EUR 500 threshold. The checklist cites the current revision and flags missing information for manual review.
+
+For a custom case, enable OpenAI mode, upload your current procedures, select them in the sidebar,
+and describe the repair and known facts. The checklist searches the selected files, groups supported
+actions under photos, documents, and approvals, and checks that each quote appears in its cited passage.
+Review the sources and any open questions before using the result. The sample manifest only governs the
+bundled procedures; select the applicable revisions yourself for uploaded files.
+
 ## Architecture
 
 ```mermaid
@@ -112,6 +126,8 @@ See [architecture and tradeoffs](docs/architecture.md) for details.
 | POST | /api/documents | Multipart upload using the field `file` |
 | DELETE | /api/documents/{id} | Remove a document and its chunks |
 | POST | /api/ask | Ask with optional document IDs and a top-k limit |
+| GET | /api/repair-checklist/sample | Run the bundled repair case with current sample procedures |
+| POST | /api/repair-checklist | Generate a cited checklist for a scenario and selected procedure IDs |
 
 ```sh
 curl http://localhost:8080/api/ask   -H "Content-Type: application/json"   -d '{"question":"When do database backups run?","top_k":3}'

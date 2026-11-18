@@ -37,3 +37,18 @@ test("unanswerable questions show an honest refusal", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "More information needed" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Answer", exact: true })).toContainText("couldn't find enough information");
 });
+
+test("sample repair checklist cites the current approval procedure and flags gaps", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Repair Estimate Checklist", exact: true }).click();
+  await page.getByRole("button", { name: "Run sample case" }).click();
+  const checklist = page.getByRole("region", { name: "Checklist results" });
+  await expect(checklist.getByRole("heading", { name: "Photos", exact: true })).toBeVisible();
+  await expect(checklist.getByRole("heading", { name: "Documents", exact: true })).toBeVisible();
+  await expect(checklist.getByRole("heading", { name: "Approvals", exact: true })).toBeVisible();
+  await expect(checklist.getByRole("heading", { name: "Needs manual confirmation" })).toBeVisible();
+  await expect(checklist).toContainText("EUR 300");
+  await expect(checklist).not.toContainText("EUR 500");
+  await checklist.getByText(/Source supplement-approval-v2\.md/).click();
+  await expect(checklist.locator("blockquote").filter({ hasText: "EUR 300" })).toBeVisible();
+});

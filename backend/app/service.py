@@ -1,4 +1,5 @@
 import time
+from uuid import UUID
 
 from app.answers import REFUSAL, extractive_answer, generated_answer
 from app.config import Settings
@@ -23,22 +24,21 @@ class Assistant:
             filename, checksum(data), self.embedder.space, len(data), chunks, vectors,
         )
 
-    def ask(self, question: Question) -> Answer:
-        started = time.perf_counter()
-        vector = self.embedder.embed([question.question])[0]
+    def retrieve(self, text: str, document_ids: list[UUID], top_k: int) -> list[Source]:
+        vector = self.embedder.embed([text])[0]
         # pgvector cosine distance is undefined for zero vectors.
         if not any(vector):
-            return Answer(answer=REFUSAL, sources=[], mode=self.settings.mode, refused=True, elapsed_ms=0)
+            return []
         hits = self.repository.search(
-            vector, self.embedder.space, question.document_ids, question.top_k * 3,
+            vector, self.embedder.space, document_ids, top_k * 3,
         )
-        query_tokens = set(tokens(question.question))
+        query_tokens = set(tokens(text))
         hits = [
             hit for hit in hits
             if hit["score"] >= self.settings.min_score
             and (self.settings.mode != "demo" or query_tokens.intersection(tokens(hit["content"])))
-        ][:question.top_k]
-        sources = [
+        ][:top_k]
+        return [
             Source(
                 id=index, chunk_id=hit["chunk_id"], document_id=hit["document_id"],
                 filename=hit["filename"], page=hit["page"], chunk_index=hit["chunk_index"],
@@ -46,6 +46,10 @@ class Assistant:
             )
             for index, hit in enumerate(hits, 1)
         ]
+
+    def ask(self, question: Question) -> Answer:
+        started = time.perf_counter()
+        sources = self.retrieve(question.question, question.document_ids, question.top_k)
         if not sources:
             answer, sources, refused = REFUSAL, [], True
         elif self.settings.mode == "openai":
