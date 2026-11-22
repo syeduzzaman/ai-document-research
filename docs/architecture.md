@@ -34,7 +34,9 @@ The source list always comes from the database. The model cannot supply its own 
 
 FastAPI synchronous handlers run blocking PDF parsing, PostgreSQL operations and provider calls outside the event loop. Small files are indexed synchronously so the UI receives a ready-to-search result. Heavy or concurrent ingestion needs background workers.
 
-The React interface uses a single question at a time. Selected document checkboxes restrict retrieval. Source cards show exact passages and PDF pages. Errors, duplicate uploads, loading states and provider mode are visible.
+The React frontend uses JavaScript, Vite, and Tailwind CSS. Its components organize document Q&A, evidence exploration, notebook entries, and repair checklists around a shared library. Selected document checkboxes restrict question answering and passage search. Answer citations open the matching excerpt and its page number.
+
+The Evidence Explorer uses the same retrieval path as Q&A and can browse all indexed passages in a document with offset pagination. The notebook stores notes against a chunk ID. Saving a passage twice preserves its note, and deleting a document cascades to its chunks and notes. The list, save, update, and delete queries are scoped to the active embedding space. Markdown exports are generated in the browser.
 
 Nginx serves the built React app and proxies the API on the same origin. Vite provides the equivalent proxy in development. The frontend never receives an OpenAI key.
 

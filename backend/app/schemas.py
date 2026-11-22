@@ -18,23 +18,50 @@ class UploadResult(BaseModel):
     created: bool
 
 
-class Question(BaseModel):
+class RetrievalScope(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    question: str = Field(min_length=3, max_length=2000)
     document_ids: list[UUID] = Field(default_factory=list, max_length=20)
     top_k: int = Field(default=3, ge=1, le=8)
 
 
-class Source(BaseModel):
-    id: int
+class Question(RetrievalScope):
+    question: str = Field(min_length=3, max_length=2000)
+
+
+class SearchQuery(RetrievalScope):
+    query: str = Field(min_length=3, max_length=2000)
+
+
+class Passage(BaseModel):
     chunk_id: int
     document_id: UUID
     filename: str
     page: int
     chunk_index: int
     text: str
+
+
+class PassagePage(BaseModel):
+    passages: list[Passage]
+    total: int
+
+
+class Source(Passage):
+    id: int
     score: float
+
+
+class Bookmark(Passage):
+    note: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class BookmarkNote(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    note: str = Field(max_length=2000)
 
 
 class Answer(BaseModel):

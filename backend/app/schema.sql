@@ -22,3 +22,10 @@ CREATE TABLE IF NOT EXISTS chunks (
 );
 
 CREATE INDEX IF NOT EXISTS chunks_document_id_idx ON chunks(document_id);
+
+CREATE TABLE IF NOT EXISTS bookmarks (
+    chunk_id bigint PRIMARY KEY REFERENCES chunks(id) ON DELETE CASCADE,
+    note text NOT NULL DEFAULT '',
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL DEFAULT now()
+);

@@ -3,9 +3,9 @@ requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "document-assistant"
+name = "ai-document-research"
 version = "0.1.0"
-description = "A document question-answering portfolio project with verifiable retrieval."
+description = "A research workspace with cited document retrieval and optional OpenAI generation."
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.115,<1",
